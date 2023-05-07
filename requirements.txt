@@ -1,0 +1,4 @@
+nashpy==0.0.37
+networkx==3.1
+numpy==1.24.3
+scipy==1.10.1
