@@ -32,7 +32,7 @@ class TableBase(object):
         ms = move_space[:home_dist.size, :away_dist.size]
         return numpy.round(home_dist.dot(ms).dot(away_dist.transpose()), 3)
 
-    def calc_move_space(self, state, win_normalized=False):
+    def calc_move_space(self, state, win_normalized=False, compress=True):
         if not win_normalized:
             state = self.win_condition.normalize(state)
         space = numpy.zeros((state.home_pieces+1, state.away_pieces+1),dtype="float32")
@@ -46,7 +46,7 @@ class TableBase(object):
                 space[i,j] = self._lookup_win_norm(state.move(i, j))
                 if space[i,j] < 1:
                     all_won = False
-            if all_won:
+            if all_won and compress:
                 return space[0:i+1,:]
         return space
 
@@ -58,7 +58,7 @@ class TableBase(object):
         return self._dist_win_chance(move_space, home_dist, away_dist)
 
     def debug_state(self, state):
-        move_space = self.calc_move_space(state)
+        move_space = self.calc_move_space(state, compress=False)
         home_dist, away_dist = self.eq_engine.move_distribution(move_space)
         home_dist = numpy.round(home_dist, 3)
         away_dist = numpy.round(away_dist, 3)
@@ -66,7 +66,7 @@ class TableBase(object):
         print("\nSpace:\n%s\nhome_dist: %s\naway_dist: %s\nprob: %s" % (move_space, home_dist, away_dist, prob))
 
     def comment_moves(self, state, home_move, away_move):
-        move_space = self.calc_move_space(state)
+        move_space = self.calc_move_space(state, compress=False)
         home_dist, away_dist = self.eq_engine.move_distribution(move_space)
         prev_prob = self._percent(self._dist_win_chance(move_space, home_dist, away_dist))
         new_prob = self._percent(self.calc_winchance(state.move(home_move, away_move)))
@@ -102,14 +102,14 @@ class TableBase(object):
         return numpy.random.choice(len(dist), p=dist)
 
 class ProgressUpdater(object):
-    def __init__(self, max_work, message, digits=4):
+    def __init__(self, max_work, message, digits=3):
         self.message = message
         self.max_work = float(max_work)
         self.cur_work = 0
         self.digits = digits
 
     def _percent_val(self, delta=0):
-        return round((self.cur_work+delta)/self.max_work, 4) * 100
+        return round((self.cur_work+delta)/self.max_work, self.digits) * 100
 
     def increment(self, val=1):
         should_print = self._percent_val() != self._percent_val(val)

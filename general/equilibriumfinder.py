@@ -299,7 +299,7 @@ def create():
     nash_sup = DebugFinder(NashSupportFinder())
     return SpaceReducer(SequentialMoveFinder(
             TrivialMoveFinder(),
-            ConditionalFinder(DebugFinder(NashHowsonFinder())),
+            ConditionalFinder(DebugFinder(NoisyMoveFinder(NashHowsonFinder()))),
             MinimizeApproxFinder(),
             ConditionalFinder(DebugFinder(NashVertexFinder())),
             nash_sup,

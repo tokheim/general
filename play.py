@@ -15,7 +15,7 @@ _HUMAN = "human"
 parser = argparse.ArgumentParser(prog="Generals", description="play generals game", epilog=epilog)
 parser.add_argument('-H', '--home', choices=(_HUMAN, _CPU), default=_HUMAN)
 parser.add_argument('-a', '--away', choices=(_HUMAN, _CPU), default=_CPU)
-parser.add_argument('-p', '--pieces', type=int, default=20)
+parser.add_argument('-p', '--pieces', type=int, default=100)
 parser.add_argument('-w', '--wins', type=int, default=3)
 parser.add_argument('-s', '--stats', action="store_true")
 args = parser.parse_args()
